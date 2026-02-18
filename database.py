@@ -24,35 +24,44 @@
 
 import sqlite3
 
-def setup_database():
+def create_connection():
     conn = sqlite3.connect("project_data.db")
+    return conn
+
+def create_table():
+    conn = create_connection()
     cursor = conn.cursor()
 
     cursor.execute("""
-    CREATE TABLE IF NOT EXISTS sample_data (
+    CREATE TABLE IF NOT EXISTS processed_results (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT,
-        value INTEGER
+        chunk_text TEXT,
+        positive_count INTEGER,
+        negative_count INTEGER,
+        sentiment_score INTEGER,
+        detected_keywords TEXT
     )
     """)
-
-    data = [
-        ("Sathvika", 60),
-        ("Bhavana", 70),
-        ("Saritha", 80),
-        ("Maheswar", 90),
-        ("Anvija", 100)
-    ]
-
-    cursor.executemany(
-        "INSERT INTO sample_data (name, value) VALUES (?, ?)",
-        data
-    )
 
     conn.commit()
     conn.close()
 
-    print("5 sample rows inserted successfully!")
+def insert_results(results):
+    conn = create_connection()
+    cursor = conn.cursor()
 
-if __name__ == "__main__":
-    setup_database()
+    for result in results:
+        cursor.execute("""
+        INSERT INTO processed_results 
+        (chunk_text, positive_count, negative_count, sentiment_score, detected_keywords)
+        VALUES (?, ?, ?, ?, ?)
+        """, (
+            result["chunk_text"],
+            result["positive_count"],
+            result["negative_count"],
+            result["sentiment_score"],
+            result["detected_keywords"]
+        ))
+
+    conn.commit()
+    conn.close()
