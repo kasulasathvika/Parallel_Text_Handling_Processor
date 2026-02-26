@@ -6,7 +6,8 @@ def main():
     print("Starting Product Review Analysis...\n")
 
     lines = read_file("data/large_text.txt")
-    chunks = split_into_chunks(lines, chunk_size=100)
+    CHUNK_SIZE=100
+    chunks = split_into_chunks(lines, chunk_size=CHUNK_SIZE)
 
     print("Total lines:", len(lines))
     print("Total chunks:", len(chunks))

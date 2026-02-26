@@ -2,7 +2,7 @@
 #     for i in range(1000):
 #         f.write(f".\n")
 # print("1000 lines file created")
-
+import re
 from concurrent.futures import ThreadPoolExecutor
 
 positive_words = ["good", "excellent", "happy", "amazing", "perfect"]
@@ -10,8 +10,12 @@ negative_words = ["bad", "error", "fail", "issue", "poor", "slow"]
 important_keywords = ["delivery", "quality", "service", "price", "support"]
 
 def read_file(file_path):
-    with open(file_path, "r", encoding="utf-8") as f:
-        return f.readlines()
+    try:
+        with open(file_path, "r", encoding="utf-8") as f:
+            return f.readlines()
+    except FileNotFoundError:
+        print("Error: File not found.")
+        return []
 
 def split_into_chunks(lines, chunk_size=100):
     chunks = []
@@ -22,7 +26,7 @@ def split_into_chunks(lines, chunk_size=100):
 
 def process_chunk(chunk):
     text = " ".join(chunk).lower()
-    words = text.split()
+    words = re.findall(r'\b\w+\b',text.lower())
 
     positive_count = sum(word in positive_words for word in words)
     negative_count = sum(word in negative_words for word in words)
@@ -39,6 +43,6 @@ def process_chunk(chunk):
         "detected_keywords": ", ".join(detected_keywords)
     }
 def process_in_parallel(chunks):
-    with ThreadPoolExecutor() as executor:
+    with ThreadPoolExecutor(max_workers=4) as executor:
         results=list(executor.map(process_chunk,chunks))
         return results

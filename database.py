@@ -25,9 +25,12 @@
 import sqlite3
 
 def create_connection():
-    conn = sqlite3.connect("project_data.db")
-    return conn
-
+    try:
+        conn = sqlite3.connect("project_data.db")
+        return conn
+    except sqlite3.Error as e:
+        print("Database connection error:", e)
+        return None
 def create_table():
     conn = create_connection()
     cursor = conn.cursor()
@@ -50,18 +53,22 @@ def insert_results(results):
     conn = create_connection()
     cursor = conn.cursor()
 
-    for result in results:
-        cursor.execute("""
-        INSERT INTO processed_results 
+    data_to_insert = [
+        (
+            r["chunk_text"],
+            r["positive_count"],
+            r["negative_count"],
+            r["sentiment_score"],
+            r["detected_keywords"]
+        )
+        for r in results
+    ]
+
+    cursor.executemany("""
+        INSERT INTO processed_results
         (chunk_text, positive_count, negative_count, sentiment_score, detected_keywords)
         VALUES (?, ?, ?, ?, ?)
-        """, (
-            result["chunk_text"],
-            result["positive_count"],
-            result["negative_count"],
-            result["sentiment_score"],
-            result["detected_keywords"]
-        ))
+    """, data_to_insert)
 
     conn.commit()
     conn.close()
