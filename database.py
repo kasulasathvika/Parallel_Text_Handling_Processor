@@ -1,74 +1,72 @@
-# import sqlite3
-
-# def setup_database():
-#     conn = sqlite3.connect("project_data.db")
-#     cursor = conn.cursor()
-
-#     cursor.execute("""
-#     CREATE TABLE IF NOT EXISTS sample_data (
-#         id INTEGER PRIMARY KEY AUTOINCREMENT,
-#         name TEXT,
-#         value INTEGER
-#     )
-#     """)
-
-#     conn.commit()
-#     conn.close()
-
-#     print("Table created successfully!")
-
-# if __name__ == "__main__":
-#     setup_database()
-
-
-
 import sqlite3
+import time
 
-def create_connection():
-    try:
-        conn = sqlite3.connect("project_data.db")
-        return conn
-    except sqlite3.Error as e:
-        print("Database connection error:", e)
-        return None
+DB_NAME="project_data.db"
+
 def create_table():
-    conn = create_connection()
+    conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
 
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS processed_results (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        chunk_text TEXT,
-        positive_count INTEGER,
-        negative_count INTEGER,
-        sentiment_score INTEGER,
-        detected_keywords TEXT
+        review_text TEXT,
+        score INTEGER,
+        sentiment TEXT
     )
     """)
 
     conn.commit()
     conn.close()
 
+
 def insert_results(results):
-    conn = create_connection()
+    conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
 
-    data_to_insert = [
-        (
-            r["chunk_text"],
-            r["positive_count"],
-            r["negative_count"],
-            r["sentiment_score"],
-            r["detected_keywords"]
-        )
-        for r in results
-    ]
-
     cursor.executemany("""
-        INSERT INTO processed_results
-        (chunk_text, positive_count, negative_count, sentiment_score, detected_keywords)
-        VALUES (?, ?, ?, ?, ?)
-    """, data_to_insert)
+    INSERT INTO processed_results (review_text, score, sentiment)
+    VALUES (?, ?, ?)
+    """, [
+        (r["review_text"], r["score"], r["sentiment"])
+        for chunk in results
+        for r in chunk
+    ])
 
     conn.commit()
+    conn.close()
+
+
+def create_index():
+    conn = sqlite3.connect(DB_NAME)
+    cursor = conn.cursor()
+
+    cursor.execute("""
+    CREATE INDEX IF NOT EXISTS idx_sentiment
+    ON processed_results(sentiment)
+    """)
+
+    conn.commit()
+    conn.close()
+
+def drop_index():
+    conn = sqlite3.connect(DB_NAME)
+    cursor = conn.cursor()
+
+    cursor.execute("DROP INDEX IF EXISTS idx_sentiment")
+
+    conn.commit()
+    conn.close()
+
+def measure_query_time():
+    conn = sqlite3.connect(DB_NAME)
+    cursor = conn.cursor()
+
+    start = time.time()
+    cursor.execute("SELECT * FROM processed_results WHERE sentiment = 'Positive'")
+    cursor.fetchall()
+    end = time.time()
+
+    print("Query Time:", round(end - start, 4), "seconds")
+
     conn.close()
