@@ -136,15 +136,4 @@ Query Time: 0.0476 seconds
 - Index creation and query optimization
 - Performance benchmarking
 
----
-
-## 📌 Future Improvements
-
-- CSV file support
-- Search functionality
-- REST API integration
-- Data visualization
-- CLI argument support
-
----
 
