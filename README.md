@@ -56,12 +56,11 @@ The system demonstrates:
 parallel_text_handling_processor/
 │
 ├── data/
-│   └── large_text.txt
+│   └── reviews.csv
 │
 ├── file_handler.py
 ├── database.py
 ├── main.py
-├── generate_large_data.py
 ├── README.md
 └── project_data.db (generated after run)
 ```
@@ -70,7 +69,7 @@ parallel_text_handling_processor/
 
 ## ⚙️ How It Works
 
-1. Read input file
+1. Read input (csv) file
 2. Split into chunks (default chunk size = 100)
 3. Process chunks using:
    - Sequential method
