@@ -6,6 +6,9 @@ import re
 from concurrent.futures import ThreadPoolExecutor
 from multiprocessing import Pool 
 import os
+import csv
+from datetime import datetime
+
 
 positive_rules = {
     "excellent": 3,
@@ -26,11 +29,24 @@ negative_rules = {
 }
 def read_file(file_path):
     try:
-        with open(file_path, "r", encoding="utf-8") as f:
+        with open(file_path,"r",encoding="utf-8") as f:
             return f.readlines()
     except FileNotFoundError:
         print("Error: File not found.")
+        return[]
+def read_csv_file(file_path):
+    reviews=[]
+    try:
+        with open(file_path, "r", encoding="utf-8") as f:
+            reader=csv.reader(f)
+            next(reader)
+            for row in reader:
+                if row:
+                    reviews.append(row[0])
+    except FileNotFoundError:
+        print("Error: File not found.")
         return []
+    return reviews
 
 def split_into_chunks(lines, chunk_size=100):
     chunks = []
@@ -60,16 +76,19 @@ def process_chunk(chunk):
             sentiment = "Negative"
         else:
             sentiment = "Neutral"
+        
+        timestamp=datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
         results.append({
             "review_text": text.strip(),
             "score": score,
-            "sentiment": sentiment
+            "sentiment": sentiment,
+            "timestamp": timestamp
         })
 
     return results
 def process_in_parallel(chunks):
-    with ThreadPoolExecutor(max_workers=4) as executor:
+    with ThreadPoolExecutor(max_workers=os.cpu_count()) as executor:
         results=list(executor.map(process_chunk,chunks))
         return results
 def process_single(chunks):

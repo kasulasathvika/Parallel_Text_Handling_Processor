@@ -12,9 +12,11 @@ def create_table():
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         review_text TEXT,
         score INTEGER,
-        sentiment TEXT
+        sentiment TEXT,
+        timestamp TEXT
     )
     """)
+    cursor.execute("DELETE from processed_results")
 
     conn.commit()
     conn.close()
@@ -25,10 +27,10 @@ def insert_results(results):
     cursor = conn.cursor()
 
     cursor.executemany("""
-    INSERT INTO processed_results (review_text, score, sentiment)
-    VALUES (?, ?, ?)
+    INSERT INTO processed_results (review_text, score, sentiment,timestamp)
+    VALUES (?, ?, ?, ?)
     """, [
-        (r["review_text"], r["score"], r["sentiment"])
+        (r["review_text"], r["score"], r["sentiment"],r["timestamp"])
         for chunk in results
         for r in chunk
     ])

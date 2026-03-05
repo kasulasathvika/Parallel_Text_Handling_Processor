@@ -1,5 +1,6 @@
 from file_handler import (
     read_file,
+    read_csv_file,
     split_into_chunks,
     process_single,
     process_in_parallel,
@@ -19,8 +20,11 @@ import time
 if __name__ == "__main__":
 
     print("Starting Performance Comparison...")
-
-    lines = read_file("data/large_text.txt")
+    file_path="data/reviews.csv"
+    if file_path.endswith(".csv"):
+        lines=read_csv_file(file_path)
+    else:
+        lines=read_file(file_path)
     chunks = split_into_chunks(lines, chunk_size=100)
 
     print("Total reviews:", len(lines))
