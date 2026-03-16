@@ -1,138 +1,103 @@
 # Parallel Text Handling Processor
 
-## 📌 Project Overview
+## Project Overview
+The Parallel Text Handling Processor is a Python-based system designed to process large volumes of text efficiently using parallel computing techniques. The system reads large text or CSV files, performs rule-based sentiment analysis, and stores the processed results in a SQLite database.
 
-This project implements a **parallel text processing system** to analyze large product review datasets.  
-It compares different processing techniques and evaluates database performance optimization using indexing.
-
-The system demonstrates:
-
-- Sequential Processing
-- Multithreading (ThreadPoolExecutor)
-- Multiprocessing
-- Batch Database Insertion
-- Index-based Query Optimization
-- Performance Comparison
+The goal of this project is to demonstrate the advantages of parallel processing when handling large datasets.
 
 ---
 
-## 🚀 Features
+## Features
 
-### 1️⃣ Text Processing
-- Reads large review dataset
-- Splits data into configurable chunks
-- Performs sentiment analysis
-- Calculates sentiment score
-- Labels reviews as Positive / Negative / Neutral
-
-### 2️⃣ Parallel Execution
-- Single-threaded processing
-- Multithreading using ThreadPoolExecutor
-- Multiprocessing using multiprocessing.Pool
-- Performance comparison between all approaches
-
-### 3️⃣ Database Optimization
-- Stores processed results in SQLite database
-- Uses batch insertion (executemany)
-- Measures insert performance
-- Creates and drops index on sentiment column
-- Compares query performance with and without index
+- Large text/CSV file processing
+- Parallel processing using threading and multiprocessing
+- Rule-based sentiment analysis
+- SQLite database storage
+- Search functionality for processed reviews
+- Export processed results to CSV
+- Performance comparison between single processing, threading, and multiprocessing
 
 ---
 
-## 🛠 Technologies Used
+## Technologies Used
 
-- Python 3
-- SQLite3
-- ThreadPoolExecutor
-- Multiprocessing
-- VS Code
+- Python
+- SQLite
+- Concurrent Futures (ThreadPoolExecutor / ProcessPoolExecutor)
+- CSV Module
+- Git & GitHub
 
 ---
 
-## 📂 Project Structure
+## Project Structure
 
-```
 parallel_text_handling_processor/
-│
-├── data/
-│   └── reviews.csv
-│
-├── file_handler.py
-├── database.py
-├── main.py
-├── README.md
-└── project_data.db (generated after run)
-```
+
+main.py              # Main program execution  
+file_handler.py      # File reading and text processing  
+database.py          # Database operations  
+data/reviews.csv     # Input dataset  
+exported_results.csv # Exported results  
+project_data.db      # SQLite database  
+README.md
 
 ---
 
-## ⚙️ How It Works
+## How the System Works
 
-1. Read input (csv) file
-2. Split into chunks (default chunk size = 100)
-3. Process chunks using:
-   - Sequential method
-   - ThreadPoolExecutor
-   - Multiprocessing
-4. Compare execution times
-5. Store results in SQLite database
-6. Measure:
-   - Insert time
-   - Query time without index
-   - Query time with index
+1. The system reads a large CSV/text dataset.
+2. The text is divided into chunks.
+3. Chunks are processed using parallel processing.
+4. Rule-based sentiment analysis is applied.
+5. Results are stored in a SQLite database.
+6. Users can search reviews or export results to CSV.
 
 ---
 
-## ▶️ How To Run
+## Sentiment Analysis Rules
 
-### Step 1: Activate Virtual Environment
+The system uses a simple rule-based sentiment scoring approach.
 
-Windows:
-```
-venv\Scripts\activate
-```
+Positive Words:
+good, excellent, amazing, great, happy
 
-### Step 2: Run Program
-```
+Negative Words:
+bad, poor, terrible, slow, worst
+
+The sentiment score determines whether the review is Positive or Negative.
+
+---
+
+## Running the Project
+
+Run the program using:
+
 python main.py
-```
+
+Menu options:
+
+1. Search Reviews
+2. Export Results to CSV
+3. Exit
 
 ---
 
-## 📊 Example Output
+## Example Output
 
-```
-Single Processing Time: 0.29 seconds
-Threading Time: 0.31 seconds
-Multiprocessing Time: 0.33 seconds
-Insert Time: 0.10 seconds
+('Bad service and poor response from the team', -3, 'Negative', '2026-03-14')
 
---- Query Performance WITHOUT Index ---
-Query Time: 0.0478 seconds
-
---- Query Performance WITH Index ---
-Query Time: 0.0476 seconds
-```
+Showing first 10 results  
+Total results: 20077
 
 ---
 
-## 🧠 Performance Insights
-
-- Threading performs well for I/O-bound tasks.
-- Multiprocessing has overhead for smaller datasets.
-- Batch insertion improves database performance.
-- Indexing improves scalability for large datasets.
-- With moderate dataset size, query difference may be minimal.
-
----
-
-## 🎯 Learning Outcomes
+## Learning Outcomes
 
 - Understanding parallel processing in Python
 - Comparing threading vs multiprocessing
-- Efficient database insertion using executemany
-- Index creation and query optimization
-- Performance benchmarking
+- Efficient database storage using SQLite
+- Implementing rule-based sentiment analysis
+- Handling large datasets
 
+---
 
