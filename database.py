@@ -1,5 +1,6 @@
 import sqlite3
 import time
+import csv
 
 DB_NAME="project_data.db"
 
@@ -72,3 +73,44 @@ def measure_query_time():
     print("Query Time:", round(end - start, 4), "seconds")
 
     conn.close()
+def search_reviews(keyword=None, sentiment=None, min_score=None):
+    conn = sqlite3.connect("project_data.db")
+    cursor = conn.cursor()
+
+    query = "SELECT review_text, score, sentiment, timestamp FROM processed_results WHERE 1=1"
+    params = []
+
+    if keyword:
+        query += " AND review_text LIKE ?"
+        params.append(f"%{keyword}%")
+
+    if sentiment:
+        query += " AND sentiment = ?"
+        params.append(sentiment)
+
+    if min_score is not None:
+        query += " AND score >= ?"
+        params.append(min_score)
+
+    cursor.execute(query, params)
+    results = cursor.fetchall()
+
+    conn.close()
+    return results
+
+def export_to_csv(filename="exported_results.csv"):
+    conn = sqlite3.connect("project_data.db")
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT review_text, score, sentiment, timestamp FROM processed_results")
+    rows = cursor.fetchall()
+
+    conn.close()
+
+    with open(filename, "w", newline="", encoding="utf-8") as file:
+        writer = csv.writer(file)
+
+        writer.writerow(["review_text", "score", "sentiment", "timestamp"])
+        writer.writerows(rows)
+
+    print("Results exported to", filename)

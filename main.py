@@ -11,7 +11,9 @@ from database import(
     insert_results,
     drop_index,
     create_index,
-    measure_query_time
+    measure_query_time,
+    search_reviews,
+    export_to_csv
 
 )
 
@@ -70,3 +72,39 @@ if __name__ == "__main__":
     print("\n--- Query Performance WITH Index ---")
     create_index()
     measure_query_time()
+
+    while True:
+
+        print("\n----- MENU -----")
+        print("1. Search Reviews")
+        print("2. Export Results to CSV")
+        print("3. Exit")
+
+        choice = input("Enter your choice: ")
+
+        if choice == "1":
+
+            keyword = input("Enter keyword (or press enter): ")
+            sentiment = input("Enter sentiment Positive/Negative (or press enter): ")
+            score = input("Minimum score (or press enter): ")
+
+            score = int(score) if score else None
+            sentiment = sentiment if sentiment else None
+            keyword = keyword if keyword else None
+
+            results = search_reviews(keyword, sentiment, score)
+            if len(results)==0:
+                print("No Matching reviews found")
+            else:
+                for row in results[:10]:
+                    print(row)
+                print("Showing first 10 rows")
+                print("Total results:", len(results))
+
+        elif choice == "2":
+
+            export_to_csv()
+
+        elif choice == "3":
+            print("Exiting program")
+            break
