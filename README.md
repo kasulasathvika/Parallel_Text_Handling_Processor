@@ -1,103 +1,120 @@
-# Parallel Text Handling Processor
+# 🚀 Parallel Text Processing with Product Review Sentiment Analysis
 
-## Project Overview
-The Parallel Text Handling Processor is a Python-based system designed to process large volumes of text efficiently using parallel computing techniques. The system reads large text or CSV files, performs rule-based sentiment analysis, and stores the processed results in a SQLite database.
+## 📌 Project Overview
+This project is a **Parallel Text Processing System** designed to analyze **product reviews** and determine their sentiment.  
+It processes large datasets efficiently using **multithreading** and provides insights such as **positive, negative, and neutral sentiment distribution**.
 
-The goal of this project is to demonstrate the advantages of parallel processing when handling large datasets.
-
----
-
-## Features
-
-- Large text/CSV file processing
-- Parallel processing using threading and multiprocessing
-- Rule-based sentiment analysis
-- SQLite database storage
-- Search functionality for processed reviews
-- Export processed results to CSV
-- Performance comparison between single processing, threading, and multiprocessing
+The system also includes **search functionality, performance comparison, and visualization**, making it a complete data analysis tool.
 
 ---
 
-## Technologies Used
-
-- Python
-- SQLite
-- Concurrent Futures (ThreadPoolExecutor / ProcessPoolExecutor)
-- CSV Module
-- Git & GitHub
-
----
-
-## Project Structure
-
-parallel_text_handling_processor/
-
-main.py              # Main program execution  
-file_handler.py      # File reading and text processing  
-database.py          # Database operations  
-data/reviews.csv     # Input dataset  
-exported_results.csv # Exported results  
-project_data.db      # SQLite database  
-README.md
+## 🎯 Objectives
+- Analyze large-scale product review datasets  
+- Classify reviews into Positive, Negative, and Neutral  
+- Improve performance using parallel processing  
+- Provide interactive dashboard and search functionality  
+- Store processed results in a database  
 
 ---
 
-## How the System Works
-
-1. The system reads a large CSV/text dataset.
-2. The text is divided into chunks.
-3. Chunks are processed using parallel processing.
-4. Rule-based sentiment analysis is applied.
-5. Results are stored in a SQLite database.
-6. Users can search reviews or export results to CSV.
-
----
-
-## Sentiment Analysis Rules
-
-The system uses a simple rule-based sentiment scoring approach.
-
-Positive Words:
-good, excellent, amazing, great, happy
-
-Negative Words:
-bad, poor, terrible, slow, worst
-
-The sentiment score determines whether the review is Positive or Negative.
+## 🛠️ Technologies Used
+- Python  
+- Streamlit  
+- Pandas  
+- Matplotlib  
+- ThreadPoolExecutor (Multithreading)  
+- SQLite  
 
 ---
 
-## Running the Project
+## ⚡ Features
 
-Run the program using:
+### 📂 File Upload
+- Supports `.txt`, `.csv`, `.xlsx`, `.json` files  
+- Handles empty and invalid files  
 
-python main.py
+### ⚙️ Parallel Processing
+- Uses ThreadPoolExecutor  
+- Processes multiple reviews simultaneously  
+- Compares Normal vs Parallel execution time  
 
-Menu options:
+### 😊 Sentiment Analysis
+- Rule-based approach using predefined word lists  
+- Counts positive and negative words  
+- Calculates sentiment score  
+- Classifies reviews as Positive, Negative, or Neutral  
 
-1. Search Reviews
-2. Export Results to CSV
-3. Exit
+### 📊 Dashboard
+- Total number of reviews  
+- Positive / Negative / Neutral counts  
+- Pie chart visualization  
+- Performance comparison  
+
+### 🔍 Search Functionality
+- Keyword-based search on product reviews  
+- Displays matching records from database  
+- Sentiment analysis is performed on user input query  
+
+### 📥 Export Feature
+- Download results as CSV  
+
+### 📧 Email Feature
+- Send summary report via email  
 
 ---
 
-## Example Output
-
-('Bad service and poor response from the team', -3, 'Negative', '2026-03-14')
-
-Showing first 10 results  
-Total results: 20077
+## 🧠 System Workflow
+1. Upload product review dataset  
+2. Preprocess text data  
+3. Process reviews using parallel threads  
+4. Perform sentiment analysis  
+5. Store results in database  
+6. Display dashboard and charts  
+7. Search and analyze sentiment  
 
 ---
 
-## Learning Outcomes
+## 📂 Project Structure
+project/
+│
+├── app.py          # Main application (UI + Logic)  
+├── database.py     # Database operations  
+├── README.md       # Documentation  
+├── LICENSE         # MIT License  
 
-- Understanding parallel processing in Python
-- Comparing threading vs multiprocessing
-- Efficient database storage using SQLite
-- Implementing rule-based sentiment analysis
-- Handling large datasets
+---
+
+## 🚀 How to Run
+
+Install dependencies:
+pip install streamlit pandas matplotlib
+
+Run the application:
+streamlit run app.py
+
+Open in browser:
+http://localhost:8501
+
+---
+
+## ⚠️ Edge Case Handling
+- Empty file validation  
+- Invalid file handling  
+- Case-insensitive search  
+- Punctuation handling using regex  
+- Repeated word handling  
+- Large dataset processing  
+
+---
+
+## 📈 Performance
+- Compares normal vs parallel execution  
+- Parallel processing improves speed for large datasets  
+
+---
+
+## 🧾 License
+This project is licensed under the MIT License.
 
 ---
 

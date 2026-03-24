@@ -114,3 +114,9 @@ def export_to_csv(filename="exported_results.csv"):
         writer.writerows(rows)
 
     print("Results exported to", filename)
+def clear_table():
+    conn=sqlite3.connect("project_data.db")
+    cursor=conn.cursor()
+    cursor.execute("DELETE FROM processed_results")
+    conn.commit()
+    conn.close()
