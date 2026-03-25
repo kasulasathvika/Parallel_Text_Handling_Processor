@@ -6,7 +6,6 @@ import matplotlib.pyplot as plt
 from concurrent.futures import ThreadPoolExecutor
 import smtplib
 from email.mime.text import MIMEText
-import re
 
 from database import insert_results, search_reviews, clear_table
 
@@ -248,65 +247,162 @@ if st.session_state.processed:
                 st.warning("Please enter a keyword.")
                 st.stop()
 
-            # -------- SEARCH --------
-            stop_words = ["this","is","the","and","a","an"]
+            import re
 
+            # ---------------- SEARCH FILTER ----------------
+            stop_words = ["this","is","the","and","a","an"]
             words = [w for w in keyword.lower().split() if w not in stop_words]
 
-            #  df["Text"].str.lower().str.contains(keyword.lower(),na=False)
-            filtered =df[df["Text"].apply(
-                    lambda text: any(word in text.lower() for word in words)
-                )
-            ]
+            filtered = df[df["Text"].apply(
+                lambda text: any(word in text.lower() for word in words)
+            )]
 
             st.write(f"Results: {len(filtered)}")
 
             if len(filtered) > 0:
                 st.dataframe(filtered)
-
-                # ✅ IMPORTANT: THIS MUST BE INSIDE IF BLOCK
-                positive_words = [
-                    "good","excellent","amazing","awesome","great",
-                    "happy","satisfied","perfect","love","nice"
-                ]
-
-                negative_words = [
-                    "bad","worst","poor","terrible","awful",
-                    "hate","issue","problem","delay","broken"
-                ]
-
-                pos_count = 0
-                neg_count = 0
-                neu_count = 0
-
-                for text in filtered["Text"]:
-                    words_in_line = re.findall(r'\b\w+\b',keyword.lower())
-
-                    for w in words_in_line:
-                        if w in positive_words:
-                            pos_count += 1
-                        elif w in negative_words:
-                            neg_count += 1
-                        else:
-                           continue
-                st.write(f"🟢 Total Positive words: {pos_count}")
-                st.write(f"🔴 Total Negative words: {neg_count}")
-                st.write(f"⚪ Total neutral words: {neu_count}")
-    
-
-                final_score = pos_count - neg_count
-                st.write(f"⚖ Sentiment Score: {final_score}")
-
-                if final_score > 0:
-                    st.success("Overall Sentiment: Positive")
-                elif final_score < 0:
-                    st.error("Overall Sentiment: Negative")
-                else:
-                    st.info("Overall Sentiment: Neutral")
-
             else:
-                st.warning("No results found ❌")
-                        
+                st.warning("No results found ,Not matching with the dataset.❌")
+
+            # ---------------- SENTIMENT ANALYSIS ----------------
+
+            positive_words = [
+                "good","great","excellent","amazing","awesome","fantastic","wonderful",
+                "perfect","nice","best","positive","happy","satisfied","love","liked",
+                "enjoy","fast","smooth","easy","helpful","useful","friendly","clean",
+                "beautiful","brilliant","super","cool","impressive","reliable","efficient","acceptable","fine","okay","average","satisfactory"
+            ]
+
+            negative_words = [
+                "bad","worst","poor","terrible","awful","hate","issue","problem",
+                "error","bug","fail","failed","slow","delay","broken","difficult",
+                "hard","confusing","annoying","frustrating","disappointed",
+                "unreliable","weak","boring","useless","waste","rude","dirty"
+            ]
+
+            intensifiers = ["very","extremely","too","highly"]
+
+            words_in_line = re.findall(r'\b\w+\b', keyword.lower())
+            if "but" in words_in_line:
+                but_index=words_in_line.index("but")
+            else:
+                but_index=-1
+
+            pos_count = 0
+            neg_count = 0
+
+            # -------- MAIN LOGIC --------
+            for i, w in enumerate(words_in_line):
+                weight=1
+                if but_index!=-1 and i>but_index:
+                    weight=2
+
+                # NEGATION HANDLING
+                if i > 0 and words_in_line[i-1] == "not":
+                    if w in positive_words:
+                        neg_count += 1
+                        continue
+                    elif w in negative_words:
+                        pos_count += 1
+                        continue
+
+                # POSITIVE
+                if w in positive_words:
+                    if i > 0 and words_in_line[i-1] in intensifiers:
+                        pos_count += 2
+                    else:
+                        pos_count += 1
+
+                # NEGATIVE
+                elif w in negative_words:
+                    if i > 0 and words_in_line[i-1] in intensifiers:
+                        neg_count += 2
+                    else:
+                        neg_count += 1
+
+            total_words = len(words_in_line)
+            neu_count = total_words - (pos_count + neg_count)
+
+            # -------- DISPLAY --------
+            st.write(f"🟢 Positive words: {pos_count}")
+            st.write(f"🔴 Negative words: {neg_count}")
+            st.write(f"⚪ Neutral words: {neu_count}")
+
+            # -------- SCORE --------
+            if total_words > 0:
+                score = (pos_count - neg_count) / total_words
+            else:
+                score = 0
+
+            st.write(f"⚖ Sentiment Score: {round(score, 2)}")
+
+            # -------- FINAL RESULT --------
+            if score > 0.1:
+                st.success("Overall Sentiment: Positive 😊")
+            elif score < -0.1:
+                st.error("Overall Sentiment: Negative 😞")
+            else:
+                st.info("Overall Sentiment: Neutral 😐")
+        # keyword = st.text_input("🔍 Search")
+        # search_btn = st.button("Search")
+
+        # if search_btn:
+
+        #     if keyword.strip() == "":
+        #         st.warning("Please enter a keyword.")
+        #         st.stop()
+
+        #     import re
+
+        #     stop_words = ["this","is","the","and","a","an"]
+        #     words = [w for w in keyword.lower().split() if w not in stop_words]
+
+        #     filtered = df[df["Text"].apply(
+        #         lambda text: any(word in text.lower() for word in words)
+        #     )]
+
+        #     st.write(f"Results: {len(filtered)}")
+
+        #     if len(filtered) > 0:
+        #         st.dataframe(filtered)
+        #     else:
+        #         st.warning("No results found ❌")
+
+        #     # ✅ SENTIMENT ALWAYS RUNS (IMPORTANT)
+
+        #     positive_words = [
+        #         "good","excellent","amazing","awesome","great",
+        #         "happy","satisfied","perfect","love","nice"
+        #     ]
+
+        #     negative_words = [
+        #         "bad","worst","poor","terrible","awful",
+        #         "hate","issue","problem","delay","broken"
+        #     ]
+
+        #     words_in_line = re.findall(r'\b\w+\b', keyword.lower())
+
+        #     pos_count = 0
+        #     neg_count = 0
+
+        #     for w in words_in_line:
+        #         if w in positive_words:
+        #             pos_count += 1
+        #         elif w in negative_words:
+        #             neg_count += 1
+
+        #     st.write(f"🟢 Total Positive words: {pos_count}")
+        #     st.write(f"🔴 Total Negative words: {neg_count}")
+
+        #     final_score = pos_count - neg_count
+        #     st.write(f"⚖ Sentiment Score: {final_score}")
+
+        #     if final_score > 0:
+        #         st.success("Overall Sentiment: Positive")
+        #     elif final_score < 0:
+        #         st.error("Overall Sentiment: Negative")
+        #     else:
+        #         st.info("Overall Sentiment: Neutral")
 
         # -------- TABLE --------
         st.subheader("📄 Results")
