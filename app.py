@@ -1,4 +1,3 @@
-        
 import streamlit as st
 import pandas as pd
 import time
@@ -172,11 +171,13 @@ if uploaded_file and start:
         for i, res in enumerate(executor.map(worker, lines)):
             results.append([res])
             if len(lines)<1000 or i%1000 ==0:
-                progress.progress((i+1)/len(lines))
+                progress.progress(min((i+1)/len(lines),1.0))
             # progress.progress((i+1)/len(lines))
             # log.text(f"Processing {i+1}/{len(lines)}")
             if i!=0 and i%5000==0:
                 log.text(f"Processed {i} lines...")
+    progress.progress(1.0)
+    log.text(f"processed {len(lines)} lines...")
 
     parallel_time = time.time() - start_p
 
