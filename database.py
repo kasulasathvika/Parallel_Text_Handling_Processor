@@ -120,3 +120,43 @@ def clear_table():
     cursor.execute("DELETE FROM processed_results")
     conn.commit()
     conn.close()
+import sqlite3
+def insert_filtered_results(data):
+    
+    conn = sqlite3.connect("project_data.db")
+    cursor = conn.cursor()
+
+    # cursor.executemany("""
+    # CREATE TABLE IF NOT EXISTS filtered_results (
+    #     id INTEGER PRIMARY KEY AUTOINCREMENT,
+    #     review_text TEXT,
+    #     sentiment TEXT,
+    #     timestamp TEXT
+    # )
+    # """)
+
+    cursor.executemany("""
+    INSERT INTO filtered_results (review_text, sentiment, time)
+    VALUES (?, ?, ?)
+    """, data)
+
+    conn.commit()
+    conn.close()
+import sqlite3
+
+def create_filtered_table():
+    conn = sqlite3.connect("project_data.db")
+    cursor = conn.cursor()
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS filtered_results (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        review_text TEXT,
+        sentiment TEXT,
+        time TEXT
+    )
+    """)
+
+    conn.commit()
+    conn.close() 
+# create_filtered_table()

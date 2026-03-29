@@ -6,7 +6,8 @@ from concurrent.futures import ThreadPoolExecutor
 import smtplib
 from email.mime.text import MIMEText
 
-from database import insert_results, search_reviews, clear_table
+from database import insert_results, search_reviews, clear_table ,insert_filtered_results,create_filtered_table
+create_filtered_table()
 
 # ---------------- SESSION ----------------
 if "processed" not in st.session_state:
@@ -239,6 +240,14 @@ if st.session_state.processed:
         st.download_button("📥 Download CSV", csv, "results.csv")
 
         # -------- SEARCH --------
+        # -------- SEARCH --------
+
+        # -------- SESSION --------
+        import re 
+        if "filtered" not in st.session_state:
+            st.session_state.filtered = None
+
+        # -------- SEARCH --------
         keyword = st.text_input("🔍 Search")
         search_btn = st.button("Search")
 
@@ -248,23 +257,47 @@ if st.session_state.processed:
                 st.warning("Please enter a keyword.")
                 st.stop()
 
-            import re
+            stop_words = {"this","is","the","and","a","an"}
+            words = {w for w in keyword.lower().split() if w not in stop_words}
 
-            # ---------------- SEARCH FILTER ----------------
-            stop_words = ["this","is","the","and","a","an"]
-            words = [w for w in keyword.lower().split() if w not in stop_words]
-
+            import time
+            start_time=time.time()
+            
             filtered = df[df["Text"].apply(
                 lambda text: any(word in text.lower() for word in words)
             )]
+            end_time=time.time()
+            st.write(f"Search time:{round(end_time-start_time,4)}seconds")
+            
 
-            st.write(f"Results: {len(filtered)}")
+            st.session_state.filtered = filtered   # ✅ STORE RESULT
 
-            if len(filtered) > 0:
-                st.dataframe(filtered)
-            else:
-                st.warning("No results found ,Not matching with the dataset.❌")
+        # -------- DISPLAY --------
+        if st.session_state.filtered is not None:
 
+            st.write(f"Results: {len(st.session_state.filtered)}")
+            st.dataframe(st.session_state.filtered)
+            st.write(f"Total records:{len(df)}")
+            st.write(f"Filtered records:{len(st.session_state.filtered)}")
+
+            # -------- STORE BUTTON --------
+            if st.button("💾 Store Filtered Data"):
+
+                filtered_data = []
+
+                for _, row in st.session_state.filtered.iterrows():
+                    filtered_data.append((
+                        row["Text"],
+                        row["Sentiment"],
+                        row["Time"]
+                    ))
+
+                # st.write("Rows to insert:", len(filtered_data))  # debug
+
+                insert_filtered_results(filtered_data)
+
+                st.success("Filtered data stored successfully ✅")
+                
             # ---------------- SENTIMENT ANALYSIS ----------------
 
             positive_words = [
