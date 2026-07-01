@@ -4,6 +4,10 @@ import time
 import matplotlib.pyplot as plt
 from concurrent.futures import ThreadPoolExecutor
 import smtplib
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 from email.mime.text import MIMEText
 
 from database import insert_results, search_reviews, clear_table ,insert_filtered_results,create_filtered_table
@@ -449,8 +453,8 @@ if st.session_state.processed:
 
         if st.button("Send Email"):
 
-            SENDER_EMAIL = "sathvikakasula2005@gmail.com"
-            APP_PASSWORD = "jyumrnsgvrsazdgo"
+            SENDER_EMAIL = os.getenv("SENDER_EMAIL")
+            APP_PASSWORD = os.getenv("APP_PASSWORD")
 
             msg = MIMEText(f"""
             Total: {total}
